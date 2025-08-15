@@ -71,7 +71,7 @@
   <p style="text-align:center;">EMPRESA NÚMERO DGSP 4143</p>
   <h2 style="text-align:center;">PARTE DIARIO DE TRABAJO</h2>
 
-  <form id="parteForm">
+  <div id="parteForm">
     <label>Fecha</label>
     <input type="date" name="fecha" required />
     <small>jueves, 14 de agosto de 2025</small>
@@ -90,27 +90,43 @@
 
     <button type="button" onclick="generarPDF()">📄 Generar PDF</button>
     <button type="button" onclick="enviarEmail()">📧 Enviar por Email</button>
-  </form>
+  </div>
 
   <div class="footer">
     Sistema de Parte Diario ©<br />
     Compatibilidad garantizada en móviles y navegadores
   </div>
 
+  <!-- Librería html2pdf.js -->
+  <script srcjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js
+
   <script>
     function generarPDF() {
-      alert("Función de PDF pendiente de implementación.");
+      const elemento = document.getElementById('parteForm');
+      html2pdf().set({
+        margin: 10,
+        filename: 'parte_diario.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(elemento).save();
     }
 
     function enviarEmail() {
-      const form = document.forms['parteForm'];
-      const asunto = `Parte Diario - ${form.fecha.value}`;
+      const form = document.querySelector('#parteForm');
+      const inputs = form.querySelectorAll('input, textarea');
+      const datos = {};
+      inputs.forEach(input => {
+        datos[input.name] = input.value;
+      });
+
+      const asunto = `Parte Diario - ${datos.fecha}`;
       const cuerpo = `
-Cliente: ${form.cliente.value}
-Referencia: ${form.referencia.value}
-Horario: ${form.horario.value}
+Cliente: ${datos.cliente}
+Referencia: ${datos.referencia}
+Horario: ${datos.horario}
 Tareas Realizadas:
-${form.tareas.value}
+${datos.tareas}
       `;
       const mailto = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
       window.location.href = mailto;
